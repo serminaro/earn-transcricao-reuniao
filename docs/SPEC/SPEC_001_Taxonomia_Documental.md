@@ -181,7 +181,7 @@ Cada tipo tem padrão de nomenclatura próprio, observado obrigatoriamente:
 
 Regras:
 
-- A descrição curta usa **snake_case ASCII**: minúsculas e maiúsculas separadas por underline, sem acentos, sem cedilha, sem espaços, sem hífen. `Adicionar_Reuniao_Nova`, não `Adicionar Reunião Nova` nem `adicionar-reuniao-nova`. A restrição a ASCII evita problemas de portabilidade entre sistemas de arquivos (o repositório é desenvolvido em ambiente Windows e versionado em Git).
+- A descrição curta usa **snake_case ASCII**: minúsculas e maiúsculas separadas por underline, sem acentos, sem cedilha, sem espaços, sem hífen. `Adicionar_Reuniao_Nova`, não `Adicionar Reunião Nova` nem `adicionar-reuniao-nova`. A restrição a ASCII preserva a portabilidade entre sistemas de arquivos (o repositório é desenvolvido nesta estação Linux e versionado em Git, e ASCII evita atrito caso seja aberto em outro sistema de arquivos).
 - O número `NNN` é sequencial dentro de cada tipo e **nunca é reutilizado**. Documentos descartados ou substituídos mantêm seu número; o próximo documento do mesmo tipo recebe o número seguinte. Isso garante que referências cruzadas como "conforme DEC-002" permaneçam unívocas por toda a vida do projeto.
 - Não há sufixo de versão no nome do arquivo. A versão vive no frontmatter (`versao:`) e no Histórico do documento, não no nome. Nomes como `SPEC_001_..._v2.md` violam a convenção.
 

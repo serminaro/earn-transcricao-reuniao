@@ -13,7 +13,7 @@ Fundação documental (Onda 1) concluída. O código do pipeline ainda não foi 
 | 1. Fundação documental | 4 peças SERMI (SPEC-001, REP-001, DEC-001, SPEC-002) e estrutura do repositório | Concluída (status `proposto`) |
 | 2. Documentação técnica | DECs de stack (D1 a D11) e SPECs de glossário, ambiente e schema de configuração | A fazer |
 | 3. Código | `01_transcrever.py`, `02_aplicar_mapeamento.py`, `03_gerar_ata.py` | A fazer |
-| 4. Integração Cowork | `COWORK.md` na raiz | A fazer |
+| 4. Integração do orquestrador | `CLAUDE.md` na raiz (Claude Code neste Linux) | A fazer |
 
 ## Como o pipeline vai funcionar
 

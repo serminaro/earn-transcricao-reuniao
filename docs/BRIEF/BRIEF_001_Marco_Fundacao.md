@@ -79,7 +79,7 @@ ou orientador), o projeto gradua para a fundação de cinco peças.
 |---|---|---|
 | 2. Documentação técnica | DECs de stack (D1-D11) e SPECs de glossário, ambiente e schema de configuração | a fazer |
 | 3. Código | os três scripts `01_transcrever`, `02_aplicar_mapeamento`, `03_gerar_ata` | a fazer |
-| 4. Integração Cowork | `COWORK.md` na raiz | a fazer |
+| 4. Integração do orquestrador | `CLAUDE.md` na raiz (Claude Code neste Linux) | a fazer |
 
 Pendência de qualidade que nenhuma onda documental resolve: validar o pipeline
 ponta a ponta em reunião curta e confirmar as hipóteses técnicas (com destaque

@@ -17,7 +17,7 @@ referencia: SPEC-001, REP-001, DEC-001
 
 ## 1. Propósito e o que é o projeto
 
-O earn-transcricao-reuniao é um pipeline de software local para transcrever reuniões em português brasileiro, com identificação de quem falou (diarização) e geração eventual de ata estruturada. Roda na máquina do autor, em ambiente Windows com GPU NVIDIA dedicada, combinando WhisperX (ASR Whisper, alinhamento word-level e diarização via pyannote.audio) com uma chamada a LLM em nuvem (Anthropic) apenas para a etapa de ata.
+O earn-transcricao-reuniao é um pipeline de software local para transcrever reuniões em português brasileiro, com identificação de quem falou (diarização) e geração eventual de ata estruturada. Roda na máquina do autor, nesta estação Linux (Ubuntu/Debian, descrita e governada em `~/Projetos/learn-manutencao-linux`) com GPU NVIDIA dedicada, combinando WhisperX (ASR Whisper, alinhamento word-level e diarização via pyannote.audio) com uma chamada a LLM em nuvem (Anthropic) apenas para a etapa de ata.
 
 O projeto é uma ferramenta operacional pessoal e profissional. Não é SaaS, não é produto público, não é serviço com SLA. A entrada são arquivos de áudio de reuniões reais do autor (2 a 4 participantes típico, até 8 ocasional, 30 a 90 minutos, até cinco reuniões por semana); a saída são transcrições legíveis com falantes nomeados e, quando solicitada, uma ata em Markdown. O ganho prático é deixar de depender de memória ou de anotação manual durante a reunião, preservando o teor sem enviar o áudio bruto para serviços de transcrição de terceiros.
 

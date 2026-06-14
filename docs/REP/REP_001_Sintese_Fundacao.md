@@ -38,7 +38,7 @@ Esta onda fundacional cobre a base documental do projeto sob o padrão SERMI, n�
 **Fora do escopo desta onda (fica para ondas seguintes):**
 
 - O código dos três scripts Python (`01_transcrever.py`, `02_aplicar_mapeamento.py`, `03_gerar_ata.py`), que é Onda 3.
-- O `COWORK.md` na raiz, instrução de pasta para o agente orquestrador, que é Onda 4.
+- O `CLAUDE.md` na raiz, instrução para o Claude Code operar o pipeline neste Linux, que é Onda 4.
 - As DECs técnicas individuais e as SPECs de glossário, ambiente e schema de configuração, que são Onda 2.
 - A validação empírica das hipóteses técnicas (ver §5), que só ocorre quando o pipeline rodar em áudio real.
 
@@ -52,7 +52,7 @@ O insumo principal desta fundação é o documento `docs/assets/shared/BRIEFING_
 
 Dois pontos de divergência entre o briefing e o estado atual precisam ficar registrados, para não propagar inconsistência:
 
-1. **Nomenclatura e ambiente.** O briefing chama o projeto de `learn-reunioes-pipeline` e referencia caminhos Windows (`C:\Users\...`). O projeto canônico atual é `earn-transcricao-reuniao`, e a fundação está sendo escrita em ambiente Linux. O slug do briefing está superado pelo slug atual. Onde houver conflito, vale o nome `earn-transcricao-reuniao`. A migração eventual entre ambientes (Windows com GPU versus Linux) é uma questão técnica a tratar nas SPECs de ambiente da Onda 2, não aqui.
+1. **Nomenclatura e ambiente.** O briefing chama o projeto de `learn-reunioes-pipeline` e referencia caminhos Windows (`C:\Users\...`). O projeto canônico atual é `earn-transcricao-reuniao`. O slug do briefing está superado pelo slug atual; onde houver conflito, vale o nome `earn-transcricao-reuniao`. Quanto ao ambiente, a suposição de Windows do briefing está superada: o pipeline roda nesta estação Linux (Ubuntu/Debian) do autor, a mesma descrita e governada no projeto `~/Projetos/learn-manutencao-linux`. A descrição detalhada da estação (distribuição, GPU NVIDIA, salvaguardas de driver e kernel) vive naquele projeto e não é reproduzida aqui; este projeto a assume como dada. As SPECs de ambiente da Onda 2 detalham apenas o que é específico do pipeline de transcrição (conda env, modelos, HF_TOKEN), referenciando o learn-manutencao-linux para o resto.
 
 2. **Estrutura SERMI ingênua do briefing.** O §7 do briefing propõe uma estrutura SERMI própria (sete SPECs e sete DECs numeradas com títulos específicos). Essa proposta está superada pelo padrão canônico SERMI definido em DEC-META-002 e DEC-META-004. A numeração, a ordem de criação e a reserva dos primeiros números seguem o padrão canônico, não a sugestão do briefing. O conteúdo conceitual do §7 do briefing permanece como insumo, mas a forma documental é a canônica.
 
@@ -75,7 +75,7 @@ As decisões abaixo já foram discutidas, justificadas e aceitas no briefing (§
 | D7 | Três saídas por reunião: JSON, TXT, SRT, com JSON como fonte de verdade. | TXT e SRT são derivados do JSON. Sem JSON, qualquer reprocessamento exige re-transcrever, que é caro. Custo de JSON é trivial. | A formalizar como DEC na Onda 2 |
 | D8 | Mapeamento de falantes via arquivo YAML por reunião. | pyannote devolve labels genéricos (`SPEAKER_00`). YAML editável é a opção mais simples e auditável. Inferência por LLM e embedding de voz descartados. | A formalizar como DEC na Onda 2 |
 | D9 | LLM em nuvem para gerar a ata (não local). | Qualidade superior e simplicidade. Conteúdo das reuniões não tem sensibilidade que impeça. Trade-off aceito: dados saem da máquina. | A formalizar como DEC na Onda 2 |
-| D10 | Cowork como orquestrador, não executor da transcrição. | WhisperX precisa de GPU local e modelo pesado. Cowork agrega valor na coordenação: organização de pastas, chamada de LLM, agendamento. | A formalizar como DEC na Onda 2 |
+| D10 | Claude Code (neste Linux) como orquestrador, não executor da transcrição. Supera a escolha do briefing por Cowork. | WhisperX precisa de GPU local e modelo pesado; o orquestrador não transcreve, coordena. O Claude Code já opera nesta estação Linux (ver learn-manutencao-linux), lê `CLAUDE.md` na raiz, organiza pastas, move áudio de pendentes para processados, chama o LLM da ata e roda os scripts. Dispensa instalar e manter o Cowork. | A formalizar como DEC na Onda 2 |
 | D11 | `HF_TOKEN` lido de variável de ambiente do conda env, validado com try/except, falha cedo. | Sem `.env`, sem dependência extra. Token necessário para baixar modelos pyannote, que exigem aceite de termos. | A formalizar como DEC na Onda 2 |
 
 Decorrência arquitetural de D7 e D8: o pipeline se decompõe em três scripts (transcrever, aplicar mapeamento, gerar ata), de modo que re-derivar TXT/SRT com nomes corretos não exige re-transcrever. Essa decomposição é consequência das decisões acima e será detalhada na SPEC de pipeline operacional da Onda 2.
@@ -110,7 +110,7 @@ Premissas que servem de base para as peças subsequentes. Mudança em qualquer d
 
 | ID | Premissa |
 |---|---|
-| P1 | Hardware de transcrição: GPU NVIDIA GTX 1660 SUPER com 6 GB de VRAM. É o teto de memória que condiciona modelo, `compute_type` e `batch_size`. |
+| P1 | Estação Linux do autor (Ubuntu/Debian), descrita e governada em `~/Projetos/learn-manutencao-linux`, com GPU NVIDIA GTX 1660 SUPER de 6 GB de VRAM. A VRAM é o teto de memória que condiciona modelo, `compute_type` e `batch_size`; o SO é Linux, não Windows como supunha o briefing. |
 | P2 | Ambiente Python gerenciado por conda (não pip puro, não poetry). Python 3.10 ou superior. |
 | P3 | `HF_TOKEN` fornecido por variável de ambiente do conda env, com aceite prévio dos termos dos modelos pyannote. |
 | P4 | Provider de LLM para a ata: Anthropic, conforme exemplo de configuração do briefing (`llm_provider: "anthropic"`). |
@@ -144,7 +144,7 @@ O projeto segue um plano em quatro ondas, validando entre cada uma.
 | 1. Fundação documental | SPEC-001, REP-001 (este), DEC-001, SPEC-002 e scaffolding de pastas. | Em andamento |
 | 2. Documentação técnica | DECs técnicas (formalizando D1 a D11) e SPECs de glossário, ambiente técnico e schema de configuração por reunião. | A fazer |
 | 3. Código | Os três scripts Python: `01_transcrever.py` (evolui do `transcreve_simples.py`), `02_aplicar_mapeamento.py` e `03_gerar_ata.py`. | A fazer |
-| 4. Integração Cowork | `COWORK.md` na raiz, instrução de pasta para o agente orquestrador. | A fazer |
+| 4. Integração do orquestrador | `CLAUDE.md` na raiz, instrução para o Claude Code operar o pipeline neste Linux. | A fazer |
 
 **Próximos artefatos imediatos:**
 
@@ -164,6 +164,7 @@ O projeto segue um plano em quatro ondas, validando entre cada uma.
 | Data | Evento |
 |---|---|
 | 2026-06-14 | REP-001 v1 produzido em status `proposto`. Consolida o material disperso em `docs/assets/shared/BRIEFING_TRANSCRICAO_REUNIOES.md` (versão 1, maio de 2026) e o ponto de partida `Transcreve/transcreve_simples.py`. Registra 11 decisões técnicas herdadas (D1 a D11, a formalizar como DEC na Onda 2) e 8 premissas operacionais (P1 a P8). Marca a estrutura SERMI ingênua do §7 do briefing como superada pelo padrão canônico (DEC-META-002, DEC-META-004) e o slug `learn-reunioes-pipeline` como superado por `earn-transcricao-reuniao`. Alimenta DEC-001 (síntese atômica) e SPEC-002 (Descrição do Projeto). |
+| 2026-06-14 | Ajuste em v1 (pré-aprovação). Ambiente-alvo fixado como a estação Linux (Ubuntu/Debian) descrita em `~/Projetos/learn-manutencao-linux`, superando a suposição de Windows do briefing (§3, P1). Orquestrador passa de Cowork para o Claude Code rodando neste Linux (D10); a Onda 4 passa a entregar `CLAUDE.md` em vez de `COWORK.md` (§2, §8). |
 
 ---
 
