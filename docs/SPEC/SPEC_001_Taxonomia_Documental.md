@@ -245,7 +245,7 @@ O `.gitignore` deve cobrir explicitamente essas pastas e padrões. Apenas a estr
 O `HF_TOKEN` (token Hugging Face, necessário para baixar os modelos pyannote da diarização) **não** vive em arquivo nenhum do repositório. Ele é lido de variável de ambiente do ambiente conda, configurada uma vez:
 
 ```bash
-conda env config vars set HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxx
+conda env config vars set HF_TOKEN=hf_<seu_token>
 conda deactivate
 conda activate <nome_do_env>
 ```

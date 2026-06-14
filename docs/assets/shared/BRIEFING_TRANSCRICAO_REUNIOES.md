@@ -202,7 +202,7 @@ sem dependência extra.
 
 **Comando para configurar**:
 ```bash
-conda env config vars set HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxx
+conda env config vars set HF_TOKEN=hf_<seu_token>
 conda deactivate
 conda activate <nome_do_env>
 ```
