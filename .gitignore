@@ -1,0 +1,50 @@
+# ── Conteúdo sensível: áudio de reunião nunca vai para o repositório ──
+*.ogg
+*.m4a
+*.mp3
+*.wav
+*.flac
+*.aac
+data/audios_pendentes/
+data/audios_processados/
+
+# Saídas do pipeline (derivadas, podem conter conteúdo sensível)
+outputs/
+Transcreve/transcricao.txt
+
+# ── Segredos e ambiente ──
+.env
+.envrc
+# HF_TOKEN vive em variável de ambiente do conda, nunca em arquivo versionado
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ── Derivados de Markdown (gerados sob demanda, não versionados) ──
+*.docx
+*.pdf
+dist/
+# Exceção: assets podem conter PDF/DOCX legítimos
+!docs/assets/**/*.pdf
+!docs/assets/**/*.docx
+
+# ── SO e editores ──
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Temporários ──
+tmp/
+*.tmp
+*.log

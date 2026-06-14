@@ -1,0 +1,14 @@
+# Ambiente conda do projeto earn-transcricao-reuniao.
+#
+# Mínimo intencional na fundação: declara apenas o interpretador e o canal.
+# As dependências pesadas do pipeline (whisperx, pyannote.audio, torch com
+# suporte CUDA, anthropic) entram nas Ondas 2/3, cada uma rastreada por uma
+# DEC, conforme a regra "não adicionar dependência sem registro em DEC"
+# (briefing §12.4). Atualizar este arquivo no mesmo commit da DEC que
+# autoriza a dependência.
+name: earn-transcricao-reuniao
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
