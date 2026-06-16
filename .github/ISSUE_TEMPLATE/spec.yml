@@ -1,0 +1,40 @@
+name: SPEC técnica
+description: Produzir ou alterar uma especificação estrutural (SPEC) que dirige um módulo, schema ou processo.
+title: "[SPEC] "
+labels: ["tipo:spec"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Uma SPEC descreve **o que algo é e como funciona** (SPEC-001 §2.1). Toda SPEC nasce antes do código que ela dirige (DEC-002). Numere a partir de **SPEC-004** — o número 003 está reservado (DEC-003).
+  - type: input
+    id: numero
+    attributes:
+      label: Número SERMI pretendido
+      description: SPEC-NNN sequencial (a partir de 004). Confira o próximo número livre no INDEX_SPEC.
+      placeholder: SPEC-005
+    validations:
+      required: true
+  - type: textarea
+    id: contrato
+    attributes:
+      label: Contrato a especificar
+      description: Entradas, saídas (com schema), parâmetros, invariantes, modos de falha.
+    validations:
+      required: true
+  - type: textarea
+    id: regras
+    attributes:
+      label: Regras checáveis / critérios
+      description: Que C-NN ou R-* esta SPEC declara ou cumpre? (Opcional na abertura.)
+    validations:
+      required: false
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of Done (SPEC-004 §5)
+      options:
+        - label: Frontmatter e nome conforme SPEC-001 (§4, §5)
+        - label: Registrada no INDEX_SPEC
+        - label: gov-check limpo
+        - label: "Commit em Conventional Commits — docs(spec):"

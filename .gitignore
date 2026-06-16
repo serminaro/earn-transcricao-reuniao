@@ -7,6 +7,12 @@
 *.aac
 data/audios_pendentes/
 data/audios_processados/
+fontes-audio/
+
+# Golden set do eval: áudio + transcrição de referência (SPEC-005). Sensível,
+# fora do Git por inteiro; só o sumário agregado de métricas (números, sem teor)
+# é versionado, em docs/logs/ ou num REP.
+data/golden/
 
 # Saídas do pipeline (derivadas, podem conter conteúdo sensível)
 outputs/

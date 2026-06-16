@@ -1,0 +1,43 @@
+name: Implementação de módulo
+description: Implementar ou alterar código. Exige uma SPEC que dirija o trabalho (spec-driven).
+title: "[CODE] "
+labels: ["tipo:code"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Nenhum código nasce sem uma SPEC que o dirija** (DEC-002; SPEC-004 §2 e §5.1). Se ainda não há SPEC, abra primeiro uma issue **[SPEC]**.
+  - type: input
+    id: spec
+    attributes:
+      label: SPEC que dirige este código
+      description: Número da SPEC técnica (obrigatório pela Definition of Ready, SPEC-004 §5.1).
+      placeholder: SPEC-005
+    validations:
+      required: true
+  - type: textarea
+    id: escopo
+    attributes:
+      label: Escopo da implementação
+      description: Que parte da SPEC este item realiza? Qual o critério de aceitação (C-NN ou contrato)?
+    validations:
+      required: true
+  - type: dropdown
+    id: natureza
+    attributes:
+      label: Natureza (define a forma de verificação)
+      description: SPEC-004 §5.2 — determinístico verifica por teste; não-determinístico verifica por eval.
+      options:
+        - Determinística (testes binários / TDD)
+        - Não-determinística (eval sobre golden set)
+    validations:
+      required: true
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of Done (SPEC-004 §5.2)
+      options:
+        - label: A SPEC que dirige existe, está coerente e indexada
+        - label: Eval verde contra o threshold (não-determinístico) OU testes passam (determinístico)
+        - label: gov-check limpo
+        - label: Commit em Conventional Commits

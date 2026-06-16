@@ -6,14 +6,11 @@ O áudio é processado na máquina do autor (GPU NVIDIA dedicada). Apenas a etap
 
 ## Estado atual
 
-Fundação documental (Onda 1) concluída. O código do pipeline ainda não foi escrito; ver o plano de ondas abaixo.
+O andamento do trabalho vive no **board do fluxo** (GitHub Project), não neste README — que é vitrine, não rastreador de status (SPEC-004 §3, regra R-FLOW-04):
 
-| Onda | Entrega | Estado |
-|---|---|---|
-| 1. Fundação documental | 4 peças SERMI (SPEC-001, REP-001, DEC-001, SPEC-002) e estrutura do repositório | Concluída (status `proposto`) |
-| 2. Documentação técnica | DECs de stack (D1 a D11) e SPECs de glossário, ambiente e schema de configuração | A fazer |
-| 3. Código | `01_transcrever.py`, `02_aplicar_mapeamento.py`, `03_gerar_ata.py` | A fazer |
-| 4. Integração do orquestrador | `CLAUDE.md` na raiz (Claude Code neste Linux) | A fazer |
+➡️ **Board:** https://github.com/users/serminaro/projects/1
+
+A fundação documental e o método de trabalho (fluxo lean/kanban + protocolo de eval) estão concluídos. A construção técnica — SPECs de módulo, DECs de stack, código do pipeline e o golden set do eval — é puxada pelo board, cada item dirigido por uma SPEC e medido por um eval antes de ser dado por pronto.
 
 ## Como o pipeline vai funcionar
 
@@ -53,10 +50,18 @@ Repositório público, mas o conteúdo das reuniões nunca entra no Git. Ficam f
 
 O projeto segue o padrão documental SERMI em perfil solo (quatro peças de fundação, ver DEC-001). Pontos de entrada:
 
+Fundação:
+
 - [SPEC-001 Taxonomia Documental](docs/SPEC/SPEC_001_Taxonomia_Documental.md)
 - [SPEC-002 Descrição do Projeto](docs/SPEC/SPEC_002_Descricao_do_Projeto.md)
 - [REP-001 Síntese da Fundação](docs/REP/REP_001_Sintese_Fundacao.md)
 - [DEC-001 Fundação reflexiva](docs/DEC/DEC_001_Fundacao_Reflexiva.md)
+
+Método e processo:
+
+- [DEC-002 Adoção do spec-driven](docs/DEC/DEC_002_Adocao_Spec_Driven.md) · [GUIDE-001 Desenvolvimento dirigido por SPEC](docs/GUIDE/GUIDE_001_Desenvolvimento_Dirigido_por_Spec.md)
+- [SPEC-004 Método de Trabalho (lean/kanban)](docs/SPEC/SPEC_004_Metodo_de_Trabalho.md) · [SPEC-005 Protocolo de Avaliação (eval)](docs/SPEC/SPEC_005_Protocolo_de_Avaliacao.md)
+- [DEC-003 Reserva do número SPEC-003](docs/DEC/DEC_003_Reserva_Numeracao_SPEC_003.md) (SPECs técnicas a partir de SPEC-004)
 
 ## Ambiente
 
