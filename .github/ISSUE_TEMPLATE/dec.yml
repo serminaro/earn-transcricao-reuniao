@@ -1,0 +1,40 @@
+name: Registro de decisão (DEC)
+description: Registrar uma decisão atômica (stack, dependência, trade-off) antes de codar.
+title: "[DEC] "
+labels: ["tipo:dec"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Toda escolha de stack/dependência é uma **DEC atômica antes do código** (DEC-002; briefing §12.4). DEC aprovada é imutável (SPEC-001 §7).
+  - type: input
+    id: numero
+    attributes:
+      label: Número SERMI pretendido
+      description: DEC-NNN sequencial. Confira o próximo número livre no INDEX_DEC.
+      placeholder: DEC-004
+    validations:
+      required: true
+  - type: textarea
+    id: decisao
+    attributes:
+      label: Decisão a registrar
+      description: Uma decisão por DEC (atomicidade).
+    validations:
+      required: true
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas a considerar
+      description: Pelo menos duas, com motivo de descarte (R-TAX-08).
+    validations:
+      required: true
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of Done (SPEC-004 §5)
+      options:
+        - label: Cinco seções SERMI presentes (Contexto, Decisão, Alternativas, Consequências c/ negativas, Reavaliação)
+        - label: Registrada no INDEX_DEC
+        - label: gov-check limpo
+        - label: "Commit em Conventional Commits — docs(dec):"

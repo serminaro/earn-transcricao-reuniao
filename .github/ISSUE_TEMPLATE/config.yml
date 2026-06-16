@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Governança documental (SERMI) — SPEC-001
+    url: https://github.com/serminaro/earn-transcricao-reuniao/blob/HEAD/docs/SPEC/SPEC_001_Taxonomia_Documental.md
+    about: Taxonomia, numeração e regras R-TAX antes de abrir uma issue de documento.
+  - name: Método de trabalho (lean/kanban) — SPEC-004
+    url: https://github.com/serminaro/earn-transcricao-reuniao/blob/HEAD/docs/SPEC/SPEC_004_Metodo_de_Trabalho.md
+    about: Fluxo, colunas, limites de WIP, Definition of Ready/Done e mapa GitHub ↔ SERMI.
