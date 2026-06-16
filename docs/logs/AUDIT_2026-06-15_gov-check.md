@@ -67,3 +67,31 @@ foi retirada do `.gitignore`.
 - `.gitignore`: linha morta `Transcreve/transcricao.txt` removida.
 - D-01 fechada por completo. Demais regras: conformes ou N/A.
 - Próxima auditoria: por calendário (mensal) ou por marco (primeira execução real do pipeline).
+
+## Re-auditoria (mesma data, pós-correção)
+
+Segunda passada da skill `gov-check` na mesma sessão, para confirmar que a
+correção de D-01 fechou de fato e não abriu efeito colateral.
+
+- Passada determinística: **limpa**.
+- D-01: confirmada fechada (protótipo e dependência `openai-whisper` sumiram juntos; R-FUN-02 conforme).
+- R-TAX-09 / R-FUN-03: dados locais relocados confirmados gitignored (`git check-ignore`).
+
+### O-01 · [Baixa] — TXT solitário em `outputs/transcricoes/`
+
+A relocação de D-01 havia posto a transcrição legada em
+`outputs/transcricoes/audio_padrao.txt`, um TXT sem o par JSON/SRT. Pela letra da
+R-FUN-01 isso lê como reunião meio-processada, embora seja leftover do protótipo,
+não saída do pipeline (que ainda não existe).
+
+**Decisão do autor:** caminho (b) — corrigir o artefato. A transcrição legada foi
+movida para junto do seu áudio de origem em
+`data/audios_processados/audio_padrao.txt` (diretório totalmente gitignored).
+`outputs/transcricoes/` voltou a ficar vazio, reservado para saída real do
+pipeline. Nenhuma mudança rastreável pelo Git (movimentação entre arquivos
+ignorados).
+
+### Veredito da re-auditoria
+
+Auditoria **verde**. Nenhuma divergência aberta. Próxima auditoria: mensal ou por
+marco (primeira execução real do pipeline).
