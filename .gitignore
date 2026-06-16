@@ -10,7 +10,6 @@ data/audios_processados/
 
 # Saídas do pipeline (derivadas, podem conter conteúdo sensível)
 outputs/
-Transcreve/transcricao.txt
 
 # ── Segredos e ambiente ──
 .env
