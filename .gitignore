@@ -35,6 +35,10 @@ venv/
 env/
 *.egg-info/
 
+# Artefatos de teste/cobertura (não versionados)
+.coverage
+.pytest_cache/
+
 # ── Derivados de Markdown (gerados sob demanda, não versionados) ──
 *.docx
 *.pdf

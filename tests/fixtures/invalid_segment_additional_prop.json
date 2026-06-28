@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "metadata": {
+    "audio_source": "reuniao.m4a",
+    "created_at": "2026-06-27T14:30:00+00:00",
+    "model": "large-v3",
+    "compute_type": "int8",
+    "language": "pt",
+    "speakers_mapped": false,
+    "params": {
+      "condition_on_previous_text": false,
+      "vad": true,
+      "initial_prompt_used": false
+    }
+  },
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 2.5,
+      "text": "Bom dia.",
+      "speaker_raw": "SPEAKER_00",
+      "speaker": null,
+      "words": [],
+      "confidence": 0.8
+    }
+  ]
+}

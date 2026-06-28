@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "metadata": {
+    "audio_source": "reuniao_2026-06-27.m4a",
+    "created_at": "2026-06-27T14:30:00+00:00",
+    "model": "large-v3",
+    "compute_type": "int8",
+    "language": "pt",
+    "pipeline_version": "abc1234",
+    "speakers_mapped": false,
+    "params": {
+      "condition_on_previous_text": false,
+      "vad": true,
+      "initial_prompt_used": true,
+      "batch_size": 16
+    }
+  },
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 2.5,
+      "text": "Bom dia a todos.",
+      "speaker_raw": "SPEAKER_00",
+      "speaker": null,
+      "words": [
+        {
+          "word": "Bom",
+          "start": 0.0,
+          "end": 0.4,
+          "score": 0.91,
+          "speaker_raw": "SPEAKER_00",
+          "speaker": null
+        },
+        {
+          "word": "dia",
+          "start": 0.4,
+          "end": 0.8,
+          "score": null,
+          "speaker_raw": "SPEAKER_00",
+          "speaker": null
+        }
+      ]
+    },
+    {
+      "start": 2.5,
+      "end": 5.0,
+      "text": "Vamos começar a reunião.",
+      "speaker_raw": "SPEAKER_01",
+      "speaker": null,
+      "words": []
+    },
+    {
+      "start": 5.0,
+      "end": 6.0,
+      "text": "Texto sem dono.",
+      "speaker_raw": null,
+      "speaker": null,
+      "words": []
+    }
+  ]
+}

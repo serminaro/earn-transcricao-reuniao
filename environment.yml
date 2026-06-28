@@ -16,6 +16,10 @@ dependencies:
   - python=3.10
   - pip
   - pip:
-      - torch          # DEC-007 — backend do WhisperX (CUDA)
-      - whisperx       # DEC-007 — motor de transcrição + alinhamento word-level
-      - pyannote.audio # DEC-008 — diarização de falantes
+      # Versões fixadas: a primeira execução real (REP-002 §3) mostrou que a 3.8.x
+      # do whisperx mudou a API de diarização. Pin evita repetir o ajuste noutra máquina.
+      - torch==2.8.0          # DEC-007 — backend do WhisperX (CUDA)
+      - whisperx==3.8.6       # DEC-007 — motor de transcrição + alinhamento word-level
+      - pyannote.audio==4.0.5 # DEC-008 — diarização de falantes
+      - jsonschema            # validação do JSON fonte de verdade contra o schema (SPEC-006)
+      - pyyaml                # leitura do YAML de configuração da reunião (SPEC-009 §3.1)
