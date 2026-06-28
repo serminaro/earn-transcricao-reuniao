@@ -14,6 +14,10 @@ fontes-audio/
 # é versionado, em docs/logs/ ou num REP.
 data/golden/
 
+# Nota pessoal de estudo, fora da taxonomia SERMI (não governada pelo gov-check).
+# A cópia canônica vive em serminaro-governance/estudo/. Não versionada aqui.
+aprender.md
+
 # Saídas do pipeline (derivadas, podem conter conteúdo sensível)
 outputs/
 
