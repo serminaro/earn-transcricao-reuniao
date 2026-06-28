@@ -56,10 +56,19 @@ def _transcribe(audio_path: Any, config: dict, *, cpu: bool = False) -> dict:
 
 
 def _derive_txt(envelope: dict) -> str:
-    """Deriva a hipotese de texto do envelope (funcao pura do JSON, R-TRANS-04)."""
+    """Deriva o TXT humano do envelope (com rotulo de falante; saida do 01)."""
     from src.transcrever import derive_txt  # import preguicoso
 
     return derive_txt(envelope)
+
+
+def _plain_text(envelope: dict) -> str:
+    """Hipotese para o WER/TER: texto corrido dos segmentos, SEM rotulo de falante.
+    O WER mede palavras (nao falante; isso e a DER). Usar o derive_txt aqui injetaria
+    os tokens 'speaker'/'NN' do prefixo SPEAKER_XX e inflaria o WER."""
+    return " ".join(
+        (seg.get("text") or "").strip() for seg in envelope.get("segments", [])
+    ).strip()
 
 
 def _grade_wer(reference: str, hypothesis: str) -> dict:
@@ -234,7 +243,7 @@ def run_sample(
     if pipeline_version is None:
         pipeline_version = metadata.get("pipeline_version")
 
-    hypothesis = _derive_txt(envelope)
+    hypothesis = _plain_text(envelope)
 
     # ── Metricas (grader, Python puro) ──
     wer_res = _grade_wer(reference, hypothesis)

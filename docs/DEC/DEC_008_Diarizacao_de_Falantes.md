@@ -42,6 +42,11 @@ aceitar os termos uma vez e um `HF_TOKEN` para baixar os pesos. O token vive em
 variável de ambiente do conda, **nunca** em arquivo versionado (SPEC-002 §9,
 R-TAX-09); sua ausência é modo de falha tratado na SPEC-009 §6.
 
+Na stack fixada (whisperx 3.8.6 / pyannote-audio 4.0.5), o modelo de diarização
+efetivamente carregado é o **`pyannote/speaker-diarization-community-1`** — confirmado
+na primeira execução real (REP-002 §3). É dele que os termos precisam ser aceitos no
+Hugging Face; o `speaker-diarization-3.1` sozinho não basta nesta versão.
+
 ---
 
 ## 3. Origem / rastro
@@ -132,6 +137,7 @@ Aceitar o que o WhisperX usar por baixo sem adotar o pyannote explicitamente.
 | Data | Evento |
 |---|---|
 | 2026-06-27 | DEC-008 v1 produzida em status `proposto`. Oitava DEC; segunda de stack. Adota o `pyannote.audio` como diarizador do passo 01, integrado ao WhisperX (DEC-007); labels crus vão para `speaker_raw` e são congelados (DEC-005). Assume o modelo gated e o `HF_TOKEN` em ambiente (R-TAX-09). Descarta NeMo, ausência de diarização (C-02) e diarizador default opaco. Sustenta a SPEC-009. |
+| 2026-06-28 | Ajuste em v1 (pré-aprovação, SPEC-001 §7): registra que o modelo de diarização efetivamente carregado na stack fixada (whisperx 3.8.6 / pyannote-audio 4.0.5) é o `pyannote/speaker-diarization-community-1`, confirmado na primeira execução real (REP-002 §3). É dele que os termos do Hugging Face precisam ser aceitos. |
 
 ---
 

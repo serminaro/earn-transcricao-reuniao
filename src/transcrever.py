@@ -33,7 +33,7 @@ SCHEMA_PATH: Path = (
 # Parâmetros de stack fixados em DEC-007 (gravados em metadata.params).
 _MODEL: str = "large-v3"
 _COMPUTE_TYPE: str = "int8"
-_BATCH_SIZE: int = 16
+_BATCH_SIZE: int = 4
 
 
 # --- Hierarquia de exceções (SPEC-009 §6) -----------------------------------
@@ -261,10 +261,18 @@ def transcribe(audio_path: os.PathLike | str, config: dict, cpu: bool = False) -
     language = config.get("language", "pt")
     initial_prompt = config.get("initial_prompt") or None
 
-    # Etapas em ordem sobre uma só carga do áudio (SPEC-009 §4).
+    # Etapas em ordem sobre uma só carga do áudio (SPEC-009 §4). Entre as etapas
+    # liberamos o cache da GPU: cada etapa carrega seu próprio modelo e, numa GPU
+    # modesta, a memória acumulada estoura (CUDA OOM).
+    def _free():
+        if device == "cuda":
+            torch.cuda.empty_cache()
+
     waveform = _load_audio(audio)
     asr_result = _run_asr(waveform, config, device)
+    _free()
     aligned = _align_words(asr_result, waveform, device)
+    _free()
     diarized = _diarize(waveform, aligned, device, hf_token)
     segments = _map_segments(diarized)
 
