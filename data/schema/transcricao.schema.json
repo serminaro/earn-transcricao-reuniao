@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/serminaro/earn-transcricao-reuniao/data/schema/transcricao.schema.json",
+  "title": "Transcricao (JSON fonte de verdade) - earn-transcricao-reuniao",
+  "description": "Contrato de dados do pipeline. Saida do 01_transcrever, entrada de 02_aplicar_mapeamento e 03_gerar_ata. Definido pela SPEC-006; decisoes de forma em DEC-004 (envelope) e DEC-005 (falante em dois campos).",
+  "type": "object",
+  "required": ["schema_version", "metadata", "segments"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Versao do schema no formato MAJOR.MINOR. Esta e a 1.0 (SPEC-006 secao 7)."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Proveniencia da execucao (DEC-004). Habilita o registro de regressao do eval (SPEC-005 secao 6).",
+      "required": ["audio_source", "created_at", "model", "compute_type", "language", "params", "speakers_mapped"],
+      "additionalProperties": true,
+      "properties": {
+        "audio_source": {
+          "type": "string",
+          "description": "Nome do arquivo de audio de origem (sem caminho absoluto)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Instante de geracao do JSON, ISO 8601."
+        },
+        "model": {
+          "type": "string",
+          "description": "Modelo Whisper usado, ex.: large-v3."
+        },
+        "compute_type": {
+          "type": "string",
+          "description": "Precisao numerica usada, ex.: int8, float16."
+        },
+        "language": {
+          "type": "string",
+          "description": "Codigo do idioma, ex.: pt."
+        },
+        "pipeline_version": {
+          "type": ["string", "null"],
+          "description": "Commit ou versao do pipeline que gerou o JSON; null se indisponivel."
+        },
+        "speakers_mapped": {
+          "type": "boolean",
+          "description": "false apos o passo 01; true apos o passo 02 aplicar o mapeamento (DEC-005)."
+        },
+        "params": {
+          "type": "object",
+          "description": "Parametros de stack efetivamente usados na transcricao.",
+          "required": ["condition_on_previous_text", "vad", "initial_prompt_used"],
+          "additionalProperties": true,
+          "properties": {
+            "condition_on_previous_text": { "type": "boolean" },
+            "vad": { "type": "boolean" },
+            "batch_size": { "type": ["integer", "null"] },
+            "initial_prompt_used": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "description": "Segmentos da transcricao em ordem temporal nao-decrescente por start.",
+      "items": { "$ref": "#/$defs/segment" }
+    }
+  },
+  "$defs": {
+    "segment": {
+      "type": "object",
+      "required": ["start", "end", "text", "speaker_raw", "speaker", "words"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Inicio do segmento em segundos."
+        },
+        "end": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Fim do segmento em segundos; end >= start (invariante SPEC-006 secao 5)."
+        },
+        "text": {
+          "type": "string",
+          "description": "Texto do segmento."
+        },
+        "speaker_raw": {
+          "type": ["string", "null"],
+          "description": "Label cru do pyannote (SPEAKER_00...). null se a diarizacao nao atribuiu. Imutavel: o passo 02 nunca o reescreve (DEC-005)."
+        },
+        "speaker": {
+          "type": ["string", "null"],
+          "description": "Nome real do falante. null apos o 01; preenchido pelo 02 a partir do speaker_mapping do YAML (DEC-005)."
+        },
+        "words": {
+          "type": "array",
+          "description": "Palavras com timestamp word-level. Pode ser vazio se o alinhamento falhar para o segmento (modo de falha SPEC-006 secao 6).",
+          "items": { "$ref": "#/$defs/word" }
+        }
+      }
+    },
+    "word": {
+      "type": "object",
+      "required": ["word", "speaker_raw", "speaker"],
+      "additionalProperties": false,
+      "properties": {
+        "word": {
+          "type": "string",
+          "description": "A palavra."
+        },
+        "start": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Inicio da palavra em segundos; null se o alinhamento nao a posicionou."
+        },
+        "end": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Fim da palavra em segundos; null se o alinhamento nao a posicionou."
+        },
+        "score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confianca do alinhamento word-level, entre 0 e 1; null se indisponivel."
+        },
+        "speaker_raw": {
+          "type": ["string", "null"],
+          "description": "Label cru do pyannote para a palavra; null se nao atribuido."
+        },
+        "speaker": {
+          "type": ["string", "null"],
+          "description": "Nome real do falante para a palavra; null ate o passo 02."
+        }
+      }
+    }
+  }
+}
