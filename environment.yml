@@ -1,14 +1,21 @@
 # Ambiente conda do projeto earn-transcricao-reuniao.
 #
-# Mínimo intencional na fundação: declara apenas o interpretador e o canal.
-# As dependências pesadas do pipeline (whisperx, pyannote.audio, torch com
-# suporte CUDA, anthropic) entram nas Ondas 2/3, cada uma rastreada por uma
-# DEC, conforme a regra "não adicionar dependência sem registro em DEC"
-# (briefing §12.4). Atualizar este arquivo no mesmo commit da DEC que
-# autoriza a dependência.
+# Cada dependência pesada entra rastreada por uma DEC, conforme a regra "não
+# adicionar dependência sem registro em DEC" (briefing §12.4, SPEC-002 R-FUN-02):
+# atualizar este arquivo no mesmo commit da DEC que autoriza a dependência.
+#
+# Onda 2 — transcrição (passo 01): whisperx + torch (DEC-007, motor),
+# pyannote.audio (DEC-008, diarização). torch traz o suporte CUDA; em Linux a
+# wheel padrão do pip já inclui CUDA. Versões a fixar conforme a stack estabilizar.
+#
+# Onda 3 — ata (passo 03): anthropic ainda pendente da sua DEC; não entra aqui.
 name: earn-transcricao-reuniao
 channels:
   - conda-forge
 dependencies:
   - python=3.10
   - pip
+  - pip:
+      - torch          # DEC-007 — backend do WhisperX (CUDA)
+      - whisperx       # DEC-007 — motor de transcrição + alinhamento word-level
+      - pyannote.audio # DEC-008 — diarização de falantes
