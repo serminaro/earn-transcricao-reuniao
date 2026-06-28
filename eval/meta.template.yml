@@ -1,0 +1,75 @@
+# =============================================================================
+# meta.yml — TEMPLATE de metadados de uma amostra do golden set (SPEC-005 §2.3)
+# -----------------------------------------------------------------------------
+# Copie este arquivo para data/golden/<id_amostra>/meta.yml e preencha com os
+# dados REAIS da amostra. Este template não contém teor de reunião; o meta.yml
+# preenchido pode conter nomes próprios (vocabulário ancorado) e por isso também
+# fica fora do Git — toda a pasta data/golden/ é gitignored (R-EVAL-01).
+#
+# Sem dependência de libs: é YAML 1.1 simples (chaves, listas, strings). Comente
+# campos que não se aplicam; não invente valores só para preencher.
+# =============================================================================
+
+# --- Identidade da amostra ---------------------------------------------------
+# id: deve bater com o nome da subpasta (data/golden/<id>/). Curto e estável.
+id: "audio_padrao"
+
+# Descrição livre de 1 linha (pode ficar vazia). Não cole teor da reunião aqui.
+descricao: "Reunião-padrão de referência; recorte representativo."
+
+# --- Áudio -------------------------------------------------------------------
+audio:
+  arquivo: "audio.m4a"        # nome do arquivo de áudio nesta subpasta
+  duracao_s: 0               # duração em SEGUNDOS (inteiro). Ex.: 420 = 7 min.
+                              # Recomendado 120–600 s (2–10 min); SPEC-005 §2.3.
+  idioma: "pt"               # código do idioma falado (pt = português BR)
+
+# --- Falantes ----------------------------------------------------------------
+# Quem aparece na amostra. 'id' é o rótulo curto usado na referência/diarização;
+# 'nome' é opcional (e sensível). 'qtd' deve bater com o tamanho da lista.
+falantes:
+  qtd: 1
+  lista:
+    - id: "SPK_00"
+      nome: ""               # opcional; nome real do falante (sensível)
+      papel: ""              # opcional; ex.: "facilitador", "cliente"
+    # - id: "SPK_01"
+    #   nome: ""
+    #   papel: ""
+
+# --- Vocabulário ancorado ----------------------------------------------------
+# Os termos que a TER (Term Error Rate, SPEC-005 §4.2) vai medir: nomes próprios
+# e jargão técnico que mais doem quando errados — exatamente o que o
+# `initial_prompt` tenta ancorar. Liste a FORMA CORRETA esperada na referência.
+# 'variantes' (opcional) lista grafias/abreviações aceitáveis como acerto.
+vocabulario_ancorado:
+  - termo: ""                # ex.: "Serminaro"   (forma correta esperada)
+    tipo: "nome_proprio"     # nome_proprio | jargao | sigla | produto
+    variantes: []            # ex.: ["serminaro"]; vazio se só a forma exata vale
+  # - termo: "WhisperX"
+  #   tipo: "produto"
+  #   variantes: ["whisper x", "whisperx"]
+  # - termo: "WER"
+  #   tipo: "sigla"
+  #   variantes: ["word error rate"]
+
+# --- Fonte / proveniência ----------------------------------------------------
+# De onde veio o áudio e como a referência foi construída. Sustenta R-EVAL-03
+# (referência conferida à mão, nunca saída crua do pipeline).
+fonte:
+  origem: ""                 # ex.: "reunião interna 2026-06", "gravação de teste"
+  consentimento: false       # houve consentimento para uso como amostra? true/false
+  ref_construida_por: "humano"   # SEMPRE conferida à mão (R-EVAL-03);
+                                 # 'rascunho_pipeline_corrigido_a_mao' descreve o §2.3
+  data_referencia: ""        # AAAA-MM-DD em que a ref.txt foi conferida/fechada
+
+# --- Capacidades habilitadas por esta amostra --------------------------------
+# Marque o que a amostra permite medir, conforme os arquivos presentes.
+habilita:
+  wer: true                  # exige ref.txt
+  ter: true                  # exige ref.txt + vocabulario_ancorado preenchido
+  der: false                 # exige ref.json (word-level com falantes); SPEC-005 §4.3
+
+# --- Notas (opcional) --------------------------------------------------------
+# Observações úteis para quem rodar o eval (ruído de fundo, sotaques, cortes...).
+notas: ""
