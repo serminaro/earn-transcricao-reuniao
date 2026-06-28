@@ -19,3 +19,5 @@ dependencies:
       - torch          # DEC-007 — backend do WhisperX (CUDA)
       - whisperx       # DEC-007 — motor de transcrição + alinhamento word-level
       - pyannote.audio # DEC-008 — diarização de falantes
+      - jsonschema     # validação do JSON fonte de verdade contra o schema (SPEC-006)
+      - pyyaml         # leitura do YAML de configuração da reunião (SPEC-009 §3.1)

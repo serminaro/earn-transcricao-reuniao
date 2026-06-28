@@ -371,9 +371,12 @@ def _diarize(audio, aligned, device: str, hf_token: str):
     """Diariza com pyannote integrado ao WhisperX e costura os labels nos segmentos
     e palavras (DEC-008). Trecho sem atribuição → speaker None (SPEC-009 §4.1)."""
     import whisperx
+    from whisperx.diarize import DiarizationPipeline
 
-    diarize_pipeline = whisperx.DiarizationPipeline(
-        use_auth_token=hf_token, device=device
+    diarize_pipeline = DiarizationPipeline(
+        model_name="pyannote/speaker-diarization-community-1",
+        token=hf_token,
+        device=device,
     )
     diarize_segments = diarize_pipeline(audio)
     return whisperx.assign_word_speakers(diarize_segments, aligned)
