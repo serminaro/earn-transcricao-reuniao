@@ -237,7 +237,7 @@ O conteúdo das reuniões é potencialmente sensível, e o pipeline lida com tr�
 
 | Classe | Onde fica | Por que fora do Git |
 |---|---|---|
-| Áudio de reunião | `data/audios_pendentes/`, `data/audios_processados/` | conteúdo bruto sensível, peso alto |
+| Áudio de reunião | `data/audios/` (pasta única, SPEC-008 §4) | conteúdo bruto sensível, peso alto |
 | Outputs do pipeline | `outputs/transcricoes/`, `outputs/atas/` | transcrições e atas contêm o teor das reuniões |
 | Segredos | qualquer `.env` | não há segredo versionado |
 

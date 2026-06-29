@@ -60,7 +60,7 @@ data/golden/                         (gitignored — sensível)
 └── ...
 ```
 
-A semente já existente é o par `data/audios_processados/audio_padrao.{m4a,txt}`: um áudio com transcrição de referência em texto corrido. Migra para `data/golden/audio_padrao/` como a **amostra 0** (referência só de texto: habilita WER e TER, ainda não DER — ver §4.3).
+A semente é o áudio `data/audios/audio_padrao_morgado.m4a` (pasta única, SPEC-008 §4), cuja referência de texto é conferida à parte (R-EVAL-03). Migra para `data/golden/<amostra>/` como **amostra 0** (referência só de texto: habilita WER e TER, ainda não DER — ver §4.3). A amostra-0 efetivamente usada no baseline é `trecho_eval` (REP-002).
 
 ### 2.3 Como uma amostra de referência é construída
 
