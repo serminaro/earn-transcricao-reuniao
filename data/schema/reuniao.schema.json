@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/serminaro/earn-transcricao-reuniao/data/schema/reuniao.schema.json",
+  "title": "Inventario da reuniao (configuracao de entrada do pipeline) - earn-transcricao-reuniao",
+  "description": "Contrato do inventario por reuniao (YAML). Entrada do 01_transcrever e, via speaker_mapping, do 02_aplicar_mapeamento. Definido pela SPEC-008. Permissivo em campos extras para os passos 02/03 crescerem sem quebrar a validacao do 01.",
+  "type": "object",
+  "required": ["audio"],
+  "additionalProperties": true,
+  "properties": {
+    "audio": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/\\\\]+$",
+      "description": "Nome do arquivo de audio em data/audios/ (apenas o nome, sem caminho/barra). Resolvido pelo 01 nessa pasta (SPEC-008 secao 4)."
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "default": "pt",
+      "description": "Codigo ISO 639-1 do idioma do ASR. Ausente => default pt (SPEC-009)."
+    },
+    "vocabulario": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Nomes proprios e jargao da reuniao; o 01 monta o initial_prompt a partir desta lista (DEC-007)."
+    },
+    "initial_prompt": {
+      "type": "string",
+      "description": "Prompt explicito para o ASR. Se presente, prevalece sobre vocabulario."
+    },
+    "participantes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Nomes esperados na reuniao; referencia que ajuda a montar o speaker_mapping apos o 01."
+    },
+    "speaker_mapping": {
+      "type": "object",
+      "description": "Mapa de falante para nome real, PREENCHIDO APOS o 01 (chaves SPEAKER_NN vem da diarizacao). Input do passo 02 (DEC-005). Nao e pre-condicao da transcricao.",
+      "patternProperties": {
+        "^SPEAKER_[0-9]+$": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -7,6 +7,7 @@
 *.aac
 data/audios_pendentes/
 data/audios_processados/
+data/audios/
 fontes-audio/
 
 # Golden set do eval: áudio + transcrição de referência (SPEC-005). Sensível,
@@ -20,6 +21,12 @@ aprender.md
 
 # Saídas do pipeline (derivadas, podem conter conteúdo sensível)
 outputs/
+
+# Instâncias de inventário por reunião (SPEC-008): carregam nomes de
+# participantes/jargão. Versiona-se só o template; instâncias ficam fora do Git.
+data/configs/*.yml
+data/configs/*.yaml
+!data/configs/reuniao.template.yml
 
 # ── Segredos e ambiente ──
 .env

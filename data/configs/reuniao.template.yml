@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Inventário da reunião — modelo (SPEC-008). Copie este arquivo para
+# data/configs/<nome>.yml e preencha. Valida contra data/schema/reuniao.schema.json.
+# Cada campo abaixo traz um exemplo e uma explicação de como preencher.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# OBRIGATÓRIO. Nome do arquivo de áudio em data/audios/ (só o nome, sem caminho).
+audio: reuniao_gabriel.m4a
+
+# Idioma do ASR (código ISO de 2 letras). Pode omitir: o default é pt.
+language: pt
+
+# Nomes próprios e jargão da reunião. O 01 monta o initial_prompt a partir daqui,
+# o que melhora o acerto justamente nesses termos. Uma entrada por linha.
+vocabulario:
+  - Gabriel Dorte
+  - Bruno Serminaro
+  - Azul
+  - CCO
+
+# (OPCIONAL) Prompt explícito para o ASR. Se você preencher, ele prevalece sobre
+# 'vocabulario'. Deixe comentado para o 01 derivar o prompt do vocabulário acima.
+# initial_prompt: "Reunião entre Bruno Serminaro e Gabriel Dorte. Termos: Azul, CCO."
+
+# Quem você espera na reunião. É só referência — ajuda você a montar o
+# speaker_mapping depois de ver os rótulos. Não afeta a transcrição.
+participantes:
+  - Bruno Serminaro
+  - Gabriel Dorte
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PREENCHER DEPOIS de rodar o 01. A diarização atribui SPEAKER_00, SPEAKER_01...
+# em tempo de execução (e pode achar um falante a mais, ex.: voz de fundo). Rode
+# o 01, abra o .txt, veja quem é cada SPEAKER, e mapeie aqui. É o input do passo 02.
+# ─────────────────────────────────────────────────────────────────────────────
+# speaker_mapping:
+#   SPEAKER_00: Gabriel Dorte
+#   SPEAKER_01: Bruno Serminaro
