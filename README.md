@@ -63,6 +63,10 @@ Método e processo:
 - [SPEC-004 Método de Trabalho (lean/kanban)](docs/SPEC/SPEC_004_Metodo_de_Trabalho.md) · [SPEC-005 Protocolo de Avaliação (eval)](docs/SPEC/SPEC_005_Protocolo_de_Avaliacao.md)
 - [DEC-003 Reserva do número SPEC-003](docs/DEC/DEC_003_Reserva_Numeracao_SPEC_003.md) (SPECs técnicas a partir de SPEC-004)
 
+Uso:
+
+- [GUIDE-002 Como transcrever uma reunião](docs/GUIDE/GUIDE_002_Como_Transcrever_Uma_Reuniao.md) (passo-a-passo do `01_transcrever`)
+
 ## Ambiente
 
 Python 3.10+, gerenciado por conda. O `environment.yml` é mínimo de propósito na fundação: as dependências pesadas entram nas Ondas 2 e 3, cada uma rastreada por uma DEC.
