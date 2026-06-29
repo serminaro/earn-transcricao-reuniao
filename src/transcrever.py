@@ -377,16 +377,34 @@ def _align_words(asr_result, audio, device: str):
 
 def _diarize(audio, aligned, device: str, hf_token: str):
     """Diariza com pyannote integrado ao WhisperX e costura os labels nos segmentos
-    e palavras (DEC-008). Trecho sem atribuição → speaker None (SPEC-009 §4.1)."""
+    e palavras (DEC-008). Trecho sem atribuição → speaker None (SPEC-009 §4.1).
+
+    Numa GPU modesta (ex.: 6 GB), a rede de embeddings de falante do pyannote estoura
+    a VRAM em áudio longo (reuniões de 30-90 min). Nesse caso, cai para CPU
+    automaticamente: a diarização fica mais lenta, mas conclui. O ASR/alinhamento
+    seguem na GPU; só a diarização migra."""
+    import gc
+
+    import torch
     import whisperx
     from whisperx.diarize import DiarizationPipeline
 
-    diarize_pipeline = DiarizationPipeline(
-        model_name="pyannote/speaker-diarization-community-1",
-        token=hf_token,
-        device=device,
-    )
-    diarize_segments = diarize_pipeline(audio)
+    def _run(dev):
+        pipeline = DiarizationPipeline(
+            model_name="pyannote/speaker-diarization-community-1",
+            token=hf_token,
+            device=dev,
+        )
+        return pipeline(audio)
+
+    try:
+        diarize_segments = _run(device)
+    except RuntimeError as exc:  # inclui torch.OutOfMemoryError
+        if device != "cuda" or "out of memory" not in str(exc).lower():
+            raise
+        gc.collect()
+        torch.cuda.empty_cache()
+        diarize_segments = _run("cpu")
     return whisperx.assign_word_speakers(diarize_segments, aligned)
 
 
