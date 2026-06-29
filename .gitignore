@@ -5,9 +5,11 @@
 *.wav
 *.flac
 *.aac
-data/audios_pendentes/
-data/audios_processados/
-data/audios/
+# Pasta única de áudio de reunião (SPEC-008 §4). Ignora o conteúdo, versiona só
+# o .gitkeep para a estrutura existir num clone. "Processado" deriva da saída em
+# outputs/transcricoes/, não de mover de pasta.
+data/audios/*
+!data/audios/.gitkeep
 fontes-audio/
 
 # Golden set do eval: áudio + transcrição de referência (SPEC-005). Sensível,

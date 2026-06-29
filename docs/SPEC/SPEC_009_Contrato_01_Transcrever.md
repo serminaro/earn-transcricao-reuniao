@@ -6,14 +6,15 @@ status: proposto
 data: 2026-06-27
 autor: Bruno Serminaro
 supersede: —
-referencia: SPEC-006, SPEC-002, SPEC-005, SPEC-004, GUIDE-001, DEC-006, DEC-007, DEC-008, SPEC-001
+referencia: SPEC-008, SPEC-006, SPEC-002, SPEC-005, SPEC-004, GUIDE-001, DEC-006, DEC-007, DEC-008, SPEC-001
 ---
 
 # SPEC-009 · Contrato do script 01_transcrever
 
 > Primeira SPEC-contrato de módulo (DEC-006): fixa o que o script `01_transcrever`
-> recebe, produz e garante. Recebe um áudio de reunião e a configuração da reunião,
-> e produz o **JSON fonte de verdade** conforme a SPEC-006, mais os derivados TXT e
+> recebe, produz e garante. Recebe **só o inventário da reunião** (SPEC-008) — que
+> declara o áudio por nome e os parâmetros — e produz o **JSON fonte de verdade**
+> conforme a SPEC-006, mais os derivados TXT e
 > SRT. É o único passo que invoca o ASR e a diarização; 02 e 03 vivem do JSON que
 > ele grava. O contrato de dados (forma do JSON) é da SPEC-006 e não se repete aqui;
 > a stack (motor, modelo, diarizador) é das DEC-007 e DEC-008; esta SPEC fixa o
@@ -39,7 +40,7 @@ re-transcrever (SPEC-002 C-05).
 |---|---|
 | Entradas, saídas e parâmetros do script 01 (o contrato). | A **forma** do JSON (objeto raiz, segmentos, palavras): SPEC-006. |
 | O comportamento: ordem das etapas, política para trecho sem falante, derivação de TXT/SRT. | A **escolha de stack** (WhisperX, `large-v3`, `int8`, VAD): DEC-007; **diarização** (pyannote): DEC-008. |
-| Os invariantes do passo 01 e seus modos de falha. | O **schema do YAML** de configuração da reunião: SPEC técnica futura (slot 008). |
+| Os invariantes do passo 01 e seus modos de falha. | O **contrato do inventário** (campos, schema, convenções de caminho): SPEC-008. |
 | Como o 01 é verificado (eval + teste) e as regras `R-TRANS-NN`. | O mapeamento de nomes (02) e a ata (03): SPECs próprias. |
 
 ---
@@ -49,10 +50,10 @@ re-transcrever (SPEC-002 C-05).
 O 01 é o único produtor do JSON e o único passo que toca o ASR e o diarizador.
 
 ```
-[áudio + YAML da reunião]
-        │
+[inventário da reunião (SPEC-008)]   declara o áudio por nome (data/audios/),
+        │                            language, vocabulario/initial_prompt
         ▼
-[01_transcrever]   transcreve, alinha word-level, diariza e embrulha no envelope:
+[01_transcrever <inventario>]   transcreve, alinha word-level, diariza e embrulha:
                    metadata.speakers_mapped = false,
                    speaker_raw = label do pyannote (ou null),
                    speaker = null em todo nível
@@ -70,11 +71,16 @@ mais o reescreve. O 01 nunca preenche `speaker` (nome real) — isso é trabalho
 
 ### 3.1 Entradas
 
+A entrada de linha de comando é **só o inventário**: `python -m src.transcrever <inventario> [--cpu]`.
+O inventário (SPEC-008) é a fonte única de configuração; o 01 resolve o áudio por nome a
+partir dele. O áudio deixa de ser argumento da linha de comando.
+
 | Entrada | Forma | Observação |
 |---|---|---|
-| Áudio da reunião | arquivo local (`.m4a`, `.ogg`, `.wav`, etc.) | Caminho passado ao script. Nunca versionado (R-TAX-09). |
-| Configuração da reunião | YAML local | Mínimo usado pelo 01: `language` (ex.: `pt`) e `initial_prompt` (nomes e jargão da reunião, opcional). O schema completo do YAML é SPEC futura; o 01 lê só esses campos e ignora o resto sem falhar. |
-| Parâmetros de stack | fixados em DEC-007/DEC-008 | Não são entrada de linha de comando: são os valores consolidados (`large-v3`, `int8`, VAD, `condition_on_previous_text=False`). Gravados em `metadata.params`. |
+| Inventário da reunião | caminho do YAML, único argumento posicional | Contrato na SPEC-008; validado contra `data/schema/reuniao.schema.json` antes de transcrever (falha cedo, R-INV-01). Declara `audio` (por nome), `language`, `vocabulario`/`initial_prompt`, `participantes`. |
+| Áudio da reunião | resolvido por nome em `data/audios/` | Não é argumento de linha de comando: o 01 lê `audio` do inventário e o procura em `data/audios/` (SPEC-008 §4). Ausente lá → falha cedo. Nunca versionado (R-TAX-09). |
+| `initial_prompt` efetivo | derivado | `initial_prompt` explícito do inventário; na ausência, o 01 o monta a partir de `vocabulario` (DEC-007). Reflete em `metadata.params.initial_prompt_used`. |
+| Parâmetros de stack | fixados em DEC-007/DEC-008 | Não são entrada de linha de comando: valores consolidados (`large-v3`, `int8`, VAD, `condition_on_previous_text=False`). Gravados em `metadata.params`. |
 | `HF_TOKEN` | variável de ambiente | Necessário para baixar o modelo de diarização (pyannote, gated). Vive no ambiente conda, nunca em arquivo (R-TAX-09, DEC-008). |
 | Flag `--cpu` (opcional) | argumento de linha de comando | Habilita execução consciente em CPU quando não há GPU. Ausente por padrão. Ver §6. |
 
@@ -86,9 +92,10 @@ mais o reescreve. O 01 nunca preenche `speaker` (nome real) — isso é trabalho
 | `{nome}.txt` | derivado legível | Texto por segmento, prefixado pelo `speaker_raw` (ex.: `SPEAKER_00: ...`) enquanto não há nome real. Derivado do JSON. |
 | `{nome}.srt` | derivado de legenda | Legenda padrão com tempos do JSON. Derivado do JSON. |
 
-Os três saem em `outputs/transcricoes/`, gitignored (SPEC-002 §4.4, R-FUN-03). O JSON
-é a fonte; TXT e SRT são funções puras dele (R-TRANS-04): regerá-los nunca re-invoca
-o ASR.
+Os três saem em `outputs/transcricoes/`, **por convenção** (não é campo do inventário,
+SPEC-008 §4/INV-5), com `{nome}` derivado do nome do áudio. A pasta é gitignored
+(SPEC-002 §4.4, R-FUN-03). O JSON é a fonte; TXT e SRT são funções puras dele
+(R-TRANS-04): regerá-los nunca re-invoca o ASR.
 
 ### 3.3 Parâmetros efetivos gravados
 
@@ -210,7 +217,7 @@ Esta SPEC-009 é viva e versionável (SPEC-001 §7). Revisar quando:
   diarizador, ou troca de ASR;
 - surgir a necessidade de tornar a execução em CPU um caminho de primeira classe (e
   não só o escape via `--cpu`), ou de outro ambiente-alvo;
-- o schema do YAML de configuração (SPEC futura) fixar campos que o 01 passe a ler;
+- o contrato do inventário (SPEC-008) ganhar campos novos que o 01 passe a ler;
 - as regras `R-TRANS` estabilizarem a ponto de valer migrá-las para as `R-FUN-*` da
   SPEC-002.
 
@@ -221,6 +228,7 @@ Esta SPEC-009 é viva e versionável (SPEC-001 §7). Revisar quando:
 | Data | Versão | Evento |
 |---|---|---|
 | 2026-06-27 | v1 | SPEC-009 produzida em status `proposto`. Primeira SPEC-contrato de módulo (DEC-006). Fixa o contrato do `01_transcrever`: entradas (áudio + YAML da reunião + `HF_TOKEN` + flag `--cpu`), saídas (JSON fonte de verdade conforme SPEC-006 + TXT/SRT derivados), parâmetros gravados em `metadata`, o comportamento em cinco etapas (VAD, transcrição, alinhamento word-level, diarização, embrulho/validação), a política para trecho sem falante, seis invariantes, os modos de falha (falhar cedo) e a verificação em dois portões (eval DoD-2 + teste DoD-3). Sem GPU, falha por padrão com escape explícito via flag `--cpu` (execução consciente em CPU); fallback silencioso para CPU é descartado. Delega a forma do JSON à SPEC-006 e a stack às DEC-007 (motor) e DEC-008 (diarização). Declara cinco regras R-TRANS-01 a R-TRANS-05, com a ressalva de que o gov-check atual não as lê. Aguarda revisão e aprovação. |
+| 2026-06-28 | v1 | **Reconciliação com a SPEC-008** (status `proposto`, edição no lugar). A entrada do 01 passa a ser **só o inventário**: `python -m src.transcrever <inventario>`. O áudio deixa de ser argumento e passa a ser resolvido por nome em `data/audios/` (SPEC-008 §4); o inventário é validado contra `reuniao.schema.json` antes de transcrever (falha cedo, R-INV-01); o `initial_prompt` efetivo é derivado de `vocabulario` quando não explícito (DEC-007); a saída vai por convenção para `outputs/transcricoes/{nome}`, sem campo de configuração (INV-5). Atualizadas §1.2 (delegação ao slot 008 → SPEC-008), §2 (diagrama), §3.1 (entradas), §3.2 (saída por convenção) e §9. Implementado em `src/transcrever.py` (`run(inventario)`, `_load_inventory`/`_validate_inventory`/`_resolve_audio`/`_effective_initial_prompt`) com testes determinísticos em `tests/test_inventory.py`. |
 
 ---
 

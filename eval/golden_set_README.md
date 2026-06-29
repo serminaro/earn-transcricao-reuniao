@@ -58,15 +58,18 @@ data/golden/                         (gitignored — sensível)
 
 ## Amostra 0 (semente)
 
-A semente é o par `data/audios_processados/audio_padrao.{m4a,txt}` (áudio com
-transcrição de referência em texto corrido). Migra para `data/golden/audio_padrao/`
-como **amostra 0**: referência só de texto, habilita **WER** e **TER**, ainda não
-**DER** (SPEC-005 §2.2). Para migrar localmente (não versionado):
+A semente é o áudio `data/audios/audio_padrao_morgado.m4a` (pasta única, SPEC-008 §4);
+o `ref.txt` é a transcrição de referência **conferida por humano** (R-EVAL-03), não a
+saída crua da pipeline. Migra para `data/golden/<amostra>/` como **amostra 0**:
+referência só de texto, habilita **WER** e **TER**, ainda não **DER** (SPEC-005 §2.2).
+A amostra-0 do baseline (REP-002) é `trecho_eval`. Para montar uma amostra localmente
+(não versionado):
 
 ```bash
 mkdir -p data/golden/audio_padrao
-cp data/audios_processados/audio_padrao.m4a data/golden/audio_padrao/audio.m4a
-cp data/audios_processados/audio_padrao.txt data/golden/audio_padrao/ref.txt
+cp data/audios/audio_padrao_morgado.m4a data/golden/audio_padrao/audio.m4a
+# ref.txt: transcreva e CONFIRA à mão (R-EVAL-03); nunca a saída crua da pipeline
+$EDITOR data/golden/audio_padrao/ref.txt
 cp data/golden/meta.template.yml data/golden/audio_padrao/meta.yml
 # depois: editar meta.yml com o vocabulário ancorado, falantes, duração e fonte reais
 ```

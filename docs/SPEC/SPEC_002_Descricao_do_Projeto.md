@@ -125,7 +125,7 @@ São três saídas de transcrição por reunião, mais a ata opcional:
 |---|---|---|
 | `src/` | os três scripts numerados | sim |
 | `data/configs/` | `reuniao_template.yml`, `prompt_exemplo.txt`, e a config YAML de cada reunião | template sim; configs reais conforme sensibilidade |
-| `data/audios_pendentes/`, `data/audios_processados/` | áudio bruto | não (gitignored) |
+| `data/audios/` (pasta única, SPEC-008 §4) | áudio bruto | não (gitignored) |
 | `outputs/transcricoes/` | `{nome}.{json,txt,srt}` | não (gitignored) |
 | `outputs/atas/` | `{nome}_ata.md` | não (gitignored) |
 

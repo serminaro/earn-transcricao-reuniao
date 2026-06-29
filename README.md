@@ -38,7 +38,7 @@ docs/
   assets/ insumos (inclui o briefing original em assets/shared/)
   logs/   logs de auditoria e execução
 src/      os três scripts do pipeline (Onda 3)
-data/     configs por reunião; áudio fica fora do Git
+data/     inventário por reunião (configs/) + áudio (audios/, fora do Git) + schema/ que valida ambos
 outputs/  transcrições e atas; fora do Git
 ```
 

@@ -35,6 +35,15 @@ _MODEL: str = "large-v3"
 _COMPUTE_TYPE: str = "int8"
 _BATCH_SIZE: int = 4
 
+# Convenções de caminho da SPEC-008 §4: pasta única de áudio, saída por convenção,
+# schema do inventário de entrada. Tudo relativo à raiz do repositório.
+_REPO_ROOT: Path = Path(__file__).resolve().parent.parent
+AUDIOS_DIR: Path = _REPO_ROOT / "data" / "audios"
+OUTPUTS_DIR: Path = _REPO_ROOT / "outputs" / "transcricoes"
+INVENTORY_SCHEMA_PATH: Path = (
+    _REPO_ROOT / "data" / "schema" / "reuniao.schema.json"
+)
+
 
 # --- Hierarquia de exceções (SPEC-009 §6) -----------------------------------
 
@@ -56,6 +65,11 @@ class HfTokenError(TranscribeError):
 
 class AudioInputError(TranscribeError):
     """Áudio ausente, ilegível ou em formato não suportado."""
+
+
+class InventoryError(TranscribeError, ValueError):
+    """Inventário (YAML de entrada, SPEC-008) ausente, ilegível ou não-conforme ao
+    schema reuniao.schema.json; a mensagem aponta o campo inválido (SPEC-008 §6)."""
 
 
 # --- Fatia determinística (testável sem GPU; DoD-3) -------------------------
@@ -259,7 +273,8 @@ def transcribe(audio_path: os.PathLike | str, config: dict, cpu: bool = False) -
         )
 
     language = config.get("language", "pt")
-    initial_prompt = config.get("initial_prompt") or None
+    initial_prompt = _effective_initial_prompt(config)
+    asr_config = {**config, "initial_prompt": initial_prompt}
 
     # Etapas em ordem sobre uma só carga do áudio (SPEC-009 §4). Entre as etapas
     # liberamos o cache da GPU: cada etapa carrega seu próprio modelo e, numa GPU
@@ -269,7 +284,7 @@ def transcribe(audio_path: os.PathLike | str, config: dict, cpu: bool = False) -
             torch.cuda.empty_cache()
 
     waveform = _load_audio(audio)
-    asr_result = _run_asr(waveform, config, device)
+    asr_result = _run_asr(waveform, asr_config, device)
     _free()
     aligned = _align_words(asr_result, waveform, device)
     _free()
@@ -297,31 +312,83 @@ def transcribe(audio_path: os.PathLike | str, config: dict, cpu: bool = False) -
 
 
 def run(
-    audio_path: os.PathLike | str,
-    config_path: os.PathLike | str,
-    out_dir: os.PathLike | str,
+    inventory_path: os.PathLike | str,
     *,
     cpu: bool = False,
 ) -> dict[str, Path]:
-    """Entrypoint de orquestração: lê o YAML, chama `transcribe`, `write_outputs`."""
-    config = _load_config(config_path)
+    """Entrypoint do 01 (SPEC-008/SPEC-009): recebe SÓ o inventário da reunião.
+
+    Lê e valida o inventário contra `reuniao.schema.json` (falha cedo, R-INV-01),
+    resolve o áudio por nome em `data/audios/`, transcreve e grava a saída por
+    convenção em `outputs/transcricoes/{nome}.{json,txt,srt}` (SPEC-008 §4)."""
+    config = _load_inventory(inventory_path)
+    audio_path = _resolve_audio(config["audio"])
     envelope = transcribe(audio_path, config, cpu=cpu)
-    stem = Path(os.fspath(audio_path)).stem
-    return write_outputs(envelope, out_dir, stem)
+    return write_outputs(envelope, OUTPUTS_DIR, audio_path.stem)
+
+
+# --- Inventário de entrada (SPEC-008): leitura, validação, resolução --------
+
+def _effective_initial_prompt(config: dict) -> Optional[str]:
+    """`initial_prompt` explícito do inventário; senão derivado de `vocabulario`
+    (DEC-007, SPEC-008 §3). Espelha eval/runner._initial_prompt para que o eval e a
+    execução real ancorem o ASR do mesmo modo."""
+    explicit = config.get("initial_prompt")
+    if isinstance(explicit, str) and explicit.strip():
+        return explicit.strip()
+    vocab = config.get("vocabulario")
+    if isinstance(vocab, list):
+        terms = [str(t).strip() for t in vocab if t is not None and str(t).strip()]
+        if terms:
+            return ", ".join(terms)
+    return None
+
+
+def _load_inventory(inventory_path: os.PathLike | str) -> dict:
+    """Lê o inventário YAML (SPEC-008) e valida contra `reuniao.schema.json`.
+    Imports de PyYAML/jsonschema preguiçosos (fora da fatia determinística).
+    Falha cedo com InventoryError (SPEC-008 §6)."""
+    import yaml  # lazy: stack de execução, não usada pelos testes determinísticos
+
+    path = Path(os.fspath(inventory_path))
+    if not path.is_file():
+        raise InventoryError(f"Inventário ausente: {path}")
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError as exc:
+        raise InventoryError(f"Inventário YAML ilegível: {path} ({exc})") from exc
+    if not isinstance(data, dict):
+        raise InventoryError(f"Inventário inválido (esperado mapa): {path}")
+    _validate_inventory(data, path)
+    return data
+
+
+def _validate_inventory(config: dict, path: Path) -> None:
+    """Valida o inventário contra `reuniao.schema.json` (R-INV-01). A mensagem cita
+    o caminho do campo inválido (SPEC-008 §6). Import de jsonschema preguiçoso."""
+    import jsonschema
+
+    schema = json.loads(INVENTORY_SCHEMA_PATH.read_text(encoding="utf-8"))
+    try:
+        jsonschema.validate(instance=config, schema=schema)
+    except jsonschema.ValidationError as exc:
+        campo = "/".join(str(p) for p in exc.absolute_path) or "(raiz)"
+        raise InventoryError(
+            f"Inventário não-conforme em '{campo}': {exc.message} [{path}]"
+        ) from exc
+
+
+def _resolve_audio(name: str) -> Path:
+    """Resolve o áudio por nome em `data/audios/` (SPEC-008 §4); falha cedo se ausente."""
+    audio_path = AUDIOS_DIR / name
+    if not audio_path.is_file():
+        raise AudioInputError(
+            f"Áudio '{name}' não encontrado em {AUDIOS_DIR} (inventário, SPEC-008 §6)."
+        )
+    return audio_path
 
 
 # --- Etapas privadas da fatia GPU (imports preguiçosos) ---------------------
-
-def _load_config(config_path: os.PathLike | str) -> dict:
-    """Lê o YAML da reunião. Import de PyYAML preguiçoso (não exigido pela fatia
-    determinística). O 01 lê só `language` e `initial_prompt`; o resto é ignorado."""
-    import yaml  # lazy: stack de execução, não usada pelos testes determinísticos
-
-    with open(os.fspath(config_path), encoding="utf-8") as fh:
-        data = yaml.safe_load(fh) or {}
-    if not isinstance(data, dict):
-        raise TranscribeError(f"Config YAML inválido (esperado mapa): {config_path}")
-    return data
 
 
 def _load_audio(audio_path: os.PathLike | str):
@@ -444,11 +511,15 @@ def _build_arg_parser():
 
     parser = argparse.ArgumentParser(
         prog="01_transcrever",
-        description="Transcreve um áudio de reunião no JSON fonte de verdade (SPEC-009).",
+        description=(
+            "Transcreve uma reunião no JSON fonte de verdade (SPEC-009). A entrada é "
+            "só o inventário (SPEC-008): ele declara o áudio (por nome, em data/audios/) "
+            "e os parâmetros; a saída vai por convenção para outputs/transcricoes/."
+        ),
     )
-    parser.add_argument("audio", help="caminho do áudio local da reunião")
-    parser.add_argument("config", help="YAML de configuração da reunião")
-    parser.add_argument("out_dir", help="diretório de saída (JSON/TXT/SRT)")
+    parser.add_argument(
+        "inventario", help="caminho do inventário YAML da reunião (SPEC-008)"
+    )
     parser.add_argument(
         "--cpu",
         action="store_true",
@@ -459,6 +530,6 @@ def _build_arg_parser():
 
 if __name__ == "__main__":  # pragma: no cover
     args = _build_arg_parser().parse_args()
-    written = run(args.audio, args.config, args.out_dir, cpu=args.cpu)
+    written = run(args.inventario, cpu=args.cpu)
     for kind, path in written.items():
         print(f"{kind}: {path}")
